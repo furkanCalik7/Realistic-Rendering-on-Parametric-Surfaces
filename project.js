@@ -143,10 +143,10 @@ function adjustCameraParam() {
 
 function constructGrid() {
   for (var i = 0; i < gridSize; i++) {
-    var u = ((2 * Math.PI) / gridSize) * i;
+    var u = ((2 * Math.PI + (2 * Math.PI) / gridSize) / gridSize) * i;
     grid[i] = [];
     for (var k = 0; k < gridSize; k++) {
-      var v = ((2 * Math.PI) / gridSize) * k;
+      var v = ((2 * Math.PI + (2 * Math.PI) / gridSize) / gridSize) * k;
       grid[i][k] = {
         u: u,
         v: v,
