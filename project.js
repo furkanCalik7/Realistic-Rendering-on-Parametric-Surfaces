@@ -4,7 +4,8 @@ var gl;
 var pointsArray = [];
 var colorsArray = [];
 // Two dimensional array
-const gridSize = 150;
+const GRID_SIZE = 200;
+var SHRINK_VALUE = 10;
 var grid = [];
 
 var vertexColors = [
@@ -20,8 +21,8 @@ var vertexColors = [
 
 constructGrid();
 function constructTriangles() {
-  for (var u = 0; u < gridSize - 1; u++) {
-    for (var v = 0; v < gridSize - 1; v++) {
+  for (var u = 0; u < GRID_SIZE - 1; u++) {
+    for (var v = 0; v < GRID_SIZE - 1; v++) {
       Quad(u, v);
     }
   }
@@ -108,7 +109,7 @@ var render = function () {
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
   gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
   //console.log(pointsArray);
-  gl.drawArrays(gl.TRIANGLES, 0, gridSize * gridSize * 6);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, GRID_SIZE * GRID_SIZE * 4);
   requestAnimFrame(render);
 };
 
@@ -142,18 +143,17 @@ function adjustCameraParam() {
 }
 
 function constructGrid() {
-  for (var i = 0; i < gridSize; i++) {
-    var u = ((2 * Math.PI + (2 * Math.PI) / gridSize) / gridSize) * i;
+  for (var i = 0; i < GRID_SIZE; i++) {
+    var u = ((2 * Math.PI + (2 * Math.PI) / GRID_SIZE) / GRID_SIZE) * i;
     grid[i] = [];
-    for (var k = 0; k < gridSize; k++) {
-      var v = ((2 * Math.PI + (2 * Math.PI) / gridSize) / gridSize) * k;
+    for (var k = 0; k < GRID_SIZE; k++) {
+      var v = ((2 * Math.PI + (2 * Math.PI) / GRID_SIZE) / GRID_SIZE) * k;
       grid[i][k] = {
         u: u,
         v: v,
       };
     }
   }
-  console.log(grid);
 }
 
 function getVertexFromparameterizedFunction(u, v) {
@@ -174,14 +174,27 @@ function getVertexFromparameterizedFunction(u, v) {
       Math.sin(2 * u1) *
       (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1)));
   var z = Math.sin(v1) + 0.35 * Math.sin(5 * u1);
-  //   var x = v1 * Math.cos(u1);
-  //   var y = v1 * Math.sin(u1);
-  //   var z = Math.sin(v1);
+
+  // var x =
+  //   4 *
+  //     Math.cos(3 * u1) *
+  //     (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(15 * u1))) +
+  //   Math.cos(v1) *
+  //     Math.cos(3 * u1) *
+  //     (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(15 * u1)));
+  // var y =
+  //   4 *
+  //     Math.sin(3 * u1) *
+  //     (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(15 * u1))) +
+  //   Math.cos(v1) *
+  //     Math.sin(3 * u1) *
+  //     (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(15 * u1)));
+  // var z = Math.sin(v1) + 0.35 * Math.sin(10 * u1);
 
   return {
-    x: x / 10,
-    y: y / 10,
-    z: z / 10,
+    x: x / SHRINK_VALUE,
+    y: y / SHRINK_VALUE,
+    z: z / SHRINK_VALUE,
   };
 }
 
@@ -197,10 +210,10 @@ function Quad(u, v) {
   colorsArray.push(vertexColors[4]);
   pointsArray.push(vec4(c.x, c.y, c.z, 1));
   colorsArray.push(vertexColors[4]);
-  pointsArray.push(vec4(b.x, b.y, b.z, 1));
-  colorsArray.push(vertexColors[2]);
-  pointsArray.push(vec4(c.x, c.y, c.z, 1));
-  colorsArray.push(vertexColors[2]);
+  // pointsArray.push(vec4(b.x, b.y, b.z, 1));
+  // colorsArray.push(vertexColors[2]);
+  // pointsArray.push(vec4(c.x, c.y, c.z, 1));
+  // colorsArray.push(vertexColors[2]);
   pointsArray.push(vec4(d.x, d.y, d.z, 1));
   colorsArray.push(vertexColors[2]);
 }
