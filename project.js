@@ -8,7 +8,7 @@ var colorsArray = [];
 var textArray = [];
 var normalsArray = [];
 // Two dimensional array
-const GRID_SIZE = 150;
+const GRID_SIZE = 75;
 var SHRINK_VALUE = 10;
 var grid = [];
 
@@ -145,9 +145,22 @@ window.onload = function init() {
     flatten(specularProduct)
   );
   gl.uniform4fv(
+    gl.getUniformLocation(program, "vambientProduct"),
+    flatten(ambientProduct)
+  );
+  gl.uniform4fv(
+    gl.getUniformLocation(program, "vdiffuseProduct"),
+    flatten(diffuseProduct)
+  );
+  gl.uniform4fv(
+    gl.getUniformLocation(program, "vspecularProduct"),
+    flatten(specularProduct)
+  );
+  gl.uniform4fv(
     gl.getUniformLocation(program, "lightPosition"),
     flatten(lightPosition)
   );
+  gl.uniform1f(gl.getUniformLocation(program, "vshininess"), materialShininess);
   gl.uniform1f(gl.getUniformLocation(program, "shininess"), materialShininess);
 
   adjustCameraParam();
@@ -182,7 +195,13 @@ var render = function () {
   gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
   gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
   gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix));
-  gl.drawArrays(gl.TRIANGLES, 0, GRID_SIZE * GRID_SIZE * 6);
+  if(mode == WIREFRAME_MODE){
+    gl.drawArrays(gl.LINE_LOOP, 0, GRID_SIZE * GRID_SIZE * 6);
+  }
+  else{
+    gl.drawArrays(gl.TRIANGLES, 0, GRID_SIZE * GRID_SIZE * 6);
+  }
+  
   requestAnimFrame(render);
 };
 
@@ -190,14 +209,12 @@ function adjustCameraParam() {
   document.getElementById("Button1").onclick = function () {
     near *= 1.1;
     far *= 1.1;
-    mode = SIMPLE_MODE;
-    fmode = mode;
+    
   };
   document.getElementById("Button2").onclick = function () {
     near *= 0.9;
     far *= 0.9;
-    mode = PHONG_MODE;
-    fmode = mode;
+    
   };
   document.getElementById("Button3").onclick = function () {
     radius *= 1.1;
@@ -206,15 +223,40 @@ function adjustCameraParam() {
     radius *= 0.9;
   };
   document.getElementById("Button5").onclick = function () {
-    theta += dr;
+    near *= 1.1;
+    far *= 1.1;
+    mode = SIMPLE_MODE;
+    fmode = mode;
   };
   document.getElementById("Button6").onclick = function () {
-    theta -= dr;
+    near *= 1.1;
+    far *= 1.1;
+    mode = WIREFRAME_MODE;
+    fmode = mode;
   };
   document.getElementById("Button7").onclick = function () {
-    phi += dr;
+    near *= 1.1;
+    far *= 1.1;
+    mode = GOURAUD_MODE;
+    fmode = mode;
   };
   document.getElementById("Button8").onclick = function () {
+    near *= 1.1;
+    far *= 1.1;
+    mode = PHONG_MODE;
+    fmode = mode;
+  };
+
+  document.getElementById("Button9").onclick = function () {
+    theta += dr;
+  };
+  document.getElementById("Button10").onclick = function () {
+    theta -= dr;
+  };
+  document.getElementById("Button11").onclick = function () {
+    phi += dr;
+  };
+  document.getElementById("Button12").onclick = function () {
     phi -= dr;
   };
 }

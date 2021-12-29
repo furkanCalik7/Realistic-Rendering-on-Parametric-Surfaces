@@ -24,6 +24,10 @@ uniform mat3 normalMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
+uniform vec4 vambientProduct, vdiffuseProduct, vspecularProduct;
+uniform float vshininess;
+
+
 void main() 
 {
     fColor = vColor;
@@ -33,12 +37,38 @@ void main()
     } 
     // Wireframe mode
     else if(mode == 1) {
-        // Todo - Wireframe code
+        gl_Position = projectionMatrix*modelViewMatrix*vPosition;
     }
     // Gouraud mode
     else if(mode == 2) {
-        // Todo - Gouraud code
-    }
+        vec3 pos = (modelViewMatrix * vPosition).xyz;
+        if(lightPosition.w == 0.0) L = normalize(lightPosition.xyz);
+        else L = normalize( lightPosition.xyz - pos );
+        E = -normalize( pos );
+        vec3 H = normalize( L + E );
+        N = normalize( normalMatrix*vNormal.xyz);
+        vec4 ambient = vambientProduct;
+        float Kd = max( dot(L, N), 0.0 );
+        vec4  diffuse = Kd*vdiffuseProduct;
+
+        float Ks = pow( max(dot(N, H), 0.0), vshininess );
+        vec4  specular = Ks * vspecularProduct;
+    
+        if( dot(L, N) < 0.0 ) {
+	    specular = vec4(0.0, 0.0, 0.0, 1.0);
+        
+        }
+        
+        fColor = ambient + diffuse + specular;
+        
+
+        fColor.a = 1.0;
+        gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+
+
+    } 
+    
+    
     // Phong mode
     else if(mode == 3) {
         vec3 light;
@@ -69,21 +99,24 @@ varying vec4 fColor;
 varying vec2 fTexCoord;
 
 uniform sampler2D texture;
-void
-main()
+
+void main()
 {
 
     if(fmode == 0) {
         highp vec4 texelColor = texture2D(texture, fTexCoord);
-            gl_FragColor =  vec4(texelColor.rgb, texelColor.a);;
+            gl_FragColor =  vec4(texelColor.rgb, texelColor.a);
     } 
     // Wireframe mode
     else if(fmode == 1) {
-        // Todo - Wireframe code
+        highp vec4 texelColor = texture2D(texture, fTexCoord);
+            gl_FragColor =  vec4(1.0, 1.0, 1.0, 1.0);
     }
     // Gouraud mode
     else if(fmode == 2) {
-        // Todo - Gouraud code
+        highp vec4 texelColor = texture2D(texture, fTexCoord);
+      gl_FragColor =  vec4( texelColor.rgb * fColor.rgb, 1.0);
+        
     }
     // Phong mode
     else if(fmode == 3) {
@@ -103,7 +136,7 @@ main()
 
         highp vec4 texelColor = texture2D(texture, fTexCoord);
 
-        gl_FragColor =  vec4(texelColor.rgb * fColorr.rgb, texelColor.a);;
+        gl_FragColor =  vec4(texelColor.rgb * fColorr.rgb, texelColor.a);
     }
 }
 </script>
@@ -117,10 +150,17 @@ main()
 <button id="Button4">Decrease R</button>
 
 <p> </p>
-<button id="Button5">Increase theta</button>
-<button id="Button6">Decrease theta</button>
-<button id="Button7">Increase phi</button>
-<button id="Button8">Decrease phi</button>
+<button id="Button5">SIMPLE MODE</button>
+<button id="Button6">WIREFRAME MODE</button>
+<button id="Button7">GOURAUD MODE</button>
+<button id="Button8">PHONG MODE</button>
+<p> </p>
+
+<p> </p>
+<button id="Button9">Increase theta</button>
+<button id="Button10">Decrease theta</button>
+<button id="Button11">Increase phi</button>
+<button id="Button12">Decrease phi</button>
 <p> </p>
 
 <body>
