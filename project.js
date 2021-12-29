@@ -19,7 +19,7 @@ const WIREFRAME_MODE = 1;
 const GOURAUD_MODE = 2;
 const PHONG_MODE = 3;
 // Adjust the mode to the desired mode
-var mode = SIMPLE_MODE;
+var mode = PHONG_MODE;
 // Dont touch this one
 var fmode = mode;
 
@@ -236,37 +236,84 @@ function constructGrid() {
 function getVertexFromparameterizedFunction(u, v) {
   var u1 = grid[u][v].u;
   var v1 = grid[u][v].v;
-  // var x =
-  //   4 *
-  //     Math.cos(2 * u1) *
-  //     (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1))) +
-  //   Math.cos(v1) *
-  //     Math.cos(2 * u1) *
-  //     (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1)));
-  // var y =
-  //   4 *
-  //     Math.sin(2 * u1) *
-  //     (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1))) +
-  //   Math.cos(v1) *
-  //     Math.sin(2 * u1) *
-  //     (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1)));
-  // var z = Math.sin(v1) + 0.35 * Math.sin(5 * u1);
+  var x =
+    4 *
+      Math.cos(2 * u1) *
+      (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1))) +
+    Math.cos(v1) *
+      Math.cos(2 * u1) *
+      (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1)));
+  var y =
+    4 *
+      Math.sin(2 * u1) *
+      (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1))) +
+    Math.cos(v1) *
+      Math.sin(2 * u1) *
+      (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1)));
+  var z = Math.sin(v1) + 0.35 * Math.sin(5 * u1);
 
-  var x = (3 + Math.cos(v1)) * Math.cos(u1);
-  var y = (3 + Math.cos(v1)) * Math.sin(u1);
-  var z = Math.sin(v1);
+  // var x = (3 + Math.cos(v1)) * Math.cos(u1);
+  // var y = (3 + Math.cos(v1)) * Math.sin(u1);
+  // var z = Math.sin(v1);
 
-  var nx = Math.cos(u1) * Math.cos(v1);
-  var ny = Math.sin(u1) * Math.cos(v1);
-  var nz = Math.sin(v1);
+  // var nx = Math.cos(u1) * Math.cos(v1);
+  // var ny = Math.sin(u1) * Math.cos(v1);
+  // var nz = Math.sin(v1);
+
+  var nxu =
+    4 *
+      (-2 *
+        Math.sin(2 * u) *
+        (1 + 0.6 * (Math.cos(5 * u) + 0.75 * Math.cos(10 * u))) +
+        0.6 *
+          Math.cos(2 * u) *
+          (-5 * Math.sin(5 * u) - 7.5 * Math.sin(10 * u))) +
+    Math.cos(v) *
+      (-2 *
+        Math.sin(2 * u) *
+        (1 + 0.6 * (Math.cos(5 * u) + 0.75 * Math.cos(10 * u))) +
+        0.6 *
+          Math.cos(2 * u) *
+          (-5 * Math.sin(5 * u) - 7.5 * Math.sin(10 * u)));
+  var nyu =
+    4 *
+      (Math.cos(2 * u) *
+        2 *
+        (1 + 0.6 * (Math.cos(5 * u) + 0.75 * Math.cos(10 * u))) +
+        0.6 *
+          (-5 * Math.sin(5 * u) - 0.75 * Math.sin(10 * u)) *
+          Math.sin(2 * u)) +
+    Math.cos(v) *
+      (Math.cos(2 * u) *
+        2 *
+        (1 + 0.6 * (Math.cos(5 * u) + 0.75 * Math.cos(10 * u))) +
+        0.6 *
+          (-5 * Math.sin(5 * u) - 0.75 * Math.sin(10 * u)) *
+          Math.sin(2 * u));
+
+  var nzu = 1.75 * Math.cos(5 * u);
+
+  var nxv =
+    -Math.cos(2 * u) *
+    Math.sin(v) *
+    (0.6 * (Math.cos(5 * u) + 0.75 * Math.cos(10 * u)) + 1);
+
+  var nyv =
+    -Math.sin(2 * u) *
+    Math.sin(v) *
+    (0.6 * (Math.cos(5 * u) + 0.75 * Math.cos(10 * u)) + 1);
+  var nzv = Math.cos(v);
+
+  var n = cross(vec3(nxu, nyu, nzu), vec3(nxv, nyv, nzv));
+  var n = normalize(n);
 
   return {
     x: x / SHRINK_VALUE,
     y: y / SHRINK_VALUE,
     z: z / SHRINK_VALUE,
-    nx: nx / SHRINK_VALUE,
-    ny: ny / SHRINK_VALUE,
-    nz: nz / SHRINK_VALUE,
+    nx: n[0] / SHRINK_VALUE,
+    ny: n[1] / SHRINK_VALUE,
+    nz: n[2] / SHRINK_VALUE,
   };
 }
 
