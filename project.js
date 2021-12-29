@@ -11,6 +11,7 @@ var normalsArray = [];
 const GRID_SIZE = 75;
 var SHRINK_VALUE = 10;
 var grid = [];
+var model = true;
 
 // SHADER MODE
 
@@ -169,6 +170,43 @@ window.onload = function init() {
 
 var render = function () {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  pointsArray = [];
+  colorsArray = [];
+  normalsArray = [];
+  constructTriangles();
+  var nBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+
+  var vNormal = gl.getAttribLocation(program, "vNormal");
+  gl.vertexAttribPointer(vNormal, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vNormal);
+
+  var cBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+
+  var vColor = gl.getAttribLocation(program, "vColor");
+  gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vColor);
+
+  var vBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
+
+  var vPosition = gl.getAttribLocation(program, "vPosition");
+  gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vPosition);
+
+  var tBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, flatten(textArray), gl.STATIC_DRAW);
+  var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
+  gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vTexCoord);
+
+  
+
   gl.uniform1i(gl.getUniformLocation(program, "mode"), mode);
   gl.uniform1i(gl.getUniformLocation(program, "fmode"), fmode);
   eye = vec3(
@@ -259,6 +297,9 @@ function adjustCameraParam() {
   document.getElementById("Button12").onclick = function () {
     phi -= dr;
   };
+  document.getElementById("Button13").onclick = function () {
+    model = !model;
+  };
 }
 
 function constructGrid() {
@@ -278,7 +319,8 @@ function constructGrid() {
 function getVertexFromparameterizedFunction(u, v) {
   var u1 = grid[u][v].u;
   var v1 = grid[u][v].v;
-  var x =
+  if(model){
+    var x =
     4 *
       Math.cos(2 * u1) *
       (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1))) +
@@ -294,13 +336,8 @@ function getVertexFromparameterizedFunction(u, v) {
       (1 + 0.6 * (Math.cos(5 * u1) + 0.75 * Math.cos(10 * u1)));
   var z = Math.sin(v1) + 0.35 * Math.sin(5 * u1);
 
-  // var x = (3 + Math.cos(v1)) * Math.cos(u1);
-  // var y = (3 + Math.cos(v1)) * Math.sin(u1);
-  // var z = Math.sin(v1);
+  
 
-  // var nx = Math.cos(u1) * Math.cos(v1);
-  // var ny = Math.sin(u1) * Math.cos(v1);
-  // var nz = Math.sin(v1);
 
   var nxu =
     4 *
@@ -348,6 +385,21 @@ function getVertexFromparameterizedFunction(u, v) {
 
   var n = cross(vec3(nxu, nyu, nzu), vec3(nxv, nyv, nzv));
   var n = normalize(n);
+  }
+  else{
+    var x = (3 + Math.cos(v1)) * Math.cos(u1);
+  var y = (3 + Math.cos(v1)) * Math.sin(u1);
+  var z = Math.sin(v1);
+
+  var nx = Math.cos(u1) * Math.cos(v1);
+  var ny = Math.sin(u1) * Math.cos(v1);
+  var nz = Math.sin(v1);
+  var n = normalize(vec3(nx,ny,nz))
+  }
+  
+
+  
+  
 
   return {
     x: x / SHRINK_VALUE,
