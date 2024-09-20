@@ -1,4 +1,4 @@
-## CS 465 Computer Graphics Course Assignment 3
+Computer graphics
 # Realistic Rendering on Parametric Surfaces
 The aim of this project is to learn implementation of parametric curves and texture types on webgl.
 
